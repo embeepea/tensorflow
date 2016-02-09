@@ -253,6 +253,7 @@ def _py_wrap_cc_impl(ctx):
     cc_include_dirs += [h.dirname for h in dep.cc.transitive_headers]
     cc_includes += dep.cc.transitive_headers
   args += ["-I" + x for x in cc_include_dirs]
+  args += ["-I" + ctx.label.workspace_root]
   args += ["-o", cc_out.path]
   args += ["-outdir", py_out.dirname]
   args += [src.path]
@@ -260,7 +261,7 @@ def _py_wrap_cc_impl(ctx):
   ctx.action(executable=ctx.executable.swig_binary,
              arguments=args,
              mnemonic="PythonSwig",
-             inputs=list(set([src]) + cc_includes + ctx.files.swig_includes +
+             inputs=sorted(set([src]) + cc_includes + ctx.files.swig_includes +
                          ctx.attr.swig_deps.files),
              outputs=outputs,
              progress_message="SWIGing {input}".format(input=src.path))
